@@ -21,30 +21,25 @@ const VideoCard = ({
 
   useEffect(() => {
     const video = videoRef.current;
-
     if (!video) return;
 
     if (Hls.isSupported() && url.endsWith('.m3u8')) {
       const hls = new Hls();
       hls.loadSource(url);
       hls.attachMedia(video);
-
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (autoplay) {
-          const playPromise = video.play();
-          if (playPromise !== undefined) {
-            playPromise.catch((error) => {
-              console.warn('Autoplay bloqué, en attente d’une interaction :', error);
-            });
-          }
+          video.play().catch((err) =>
+            console.warn('Autoplay bloqué, en attente d’interaction :', err)
+          );
         }
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url;
       video.addEventListener('loadedmetadata', () => {
         if (autoplay) {
-          video.play().catch((error) =>
-            console.warn('Autoplay bloqué (Apple) :', error)
+          video.play().catch((err) =>
+            console.warn('Autoplay bloqué (Apple) :', err)
           );
         }
       });
@@ -56,7 +51,7 @@ const VideoCard = ({
   const onVideoPress = () => {
     const video = videoRef.current;
     if (video.paused) {
-      video.play().catch((err) => console.warn("Erreur play() :", err));
+      video.play().catch((err) => console.warn('Erreur play() :', err));
     } else {
       video.pause();
     }
@@ -64,18 +59,20 @@ const VideoCard = ({
 
   return (
     <div className="video">
-      <video
-        className="player"
-        onClick={onVideoPress}
-        ref={(ref) => {
-          videoRef.current = ref;
-          if (setVideoRef) setVideoRef(ref);
-        }}
-        loop
-        muted
-        playsInline
-        controls={false}
-      />
+      <div className="aspect-4-3">
+        <video
+          className="player"
+          onClick={onVideoPress}
+          ref={(ref) => {
+            videoRef.current = ref;
+            if (setVideoRef) setVideoRef(ref);
+          }}
+          loop
+          muted
+          playsInline
+          controls={false}
+        />
+      </div>
       <div className="bottom-controls">
         <div className="footer-left">
           <FooterLeft username={username} description={description} song={song} />
