@@ -1,42 +1,60 @@
 import React, { useRef, useEffect } from 'react';
+import Hls from 'hls.js';
 import FooterLeft from './FooterLeft';
 import FooterRight from './FooterRight';
 import './VideoCard.css';
 
-const VideoCard = (props) => {
-  const {
-    url,
-    username,
-    description,
-    song,
-    likes,
-    shares,
-    comments,
-    saves,
-    profilePic,
-    setVideoRef,
-    autoplay
-  } = props;
-
+const VideoCard = ({
+  url,
+  username,
+  description,
+  song,
+  likes,
+  shares,
+  comments,
+  saves,
+  profilePic,
+  setVideoRef,
+  autoplay
+}) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
     const video = videoRef.current;
 
-    if (autoplay && video) {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.warn('Autoplay  bloqué, en attente d’une interaction :', error);
-        });
-      }
+    if (!video) return;
+
+    if (Hls.isSupported() && url.endsWith('.m3u8')) {
+      const hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        if (autoplay) {
+          const playPromise = video.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.warn('Autoplay bloqué, en attente d’une interaction :', error);
+            });
+          }
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = url;
+      video.addEventListener('loadedmetadata', () => {
+        if (autoplay) {
+          video.play().catch((error) =>
+            console.warn('Autoplay bloqué (Apple) :', error)
+          );
+        }
+      });
+    } else {
+      console.error('HLS non supporté sur ce navigateur.');
     }
-  }, [autoplay]);
+  }, [url, autoplay]);
 
   const onVideoPress = () => {
     const video = videoRef.current;
-    if (!video) return;
-
     if (video.paused) {
       video.play().catch((err) => console.warn("Erreur play() :", err));
     } else {
@@ -53,11 +71,10 @@ const VideoCard = (props) => {
           videoRef.current = ref;
           if (setVideoRef) setVideoRef(ref);
         }}
-        src={url}
         loop
-        muted // 🔥 essentiel pour autoplay
-        playsInline // 🔥 mobile-friendly
-        autoPlay={autoplay} // 🔥 rend clair l’intention
+        muted
+        playsInline
+        controls={false}
       />
       <div className="bottom-controls">
         <div className="footer-left">
