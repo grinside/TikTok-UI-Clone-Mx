@@ -70,7 +70,7 @@ const VideoCard = ({
           loop
           muted
           playsInline
-          controls={false}
+          controls={true}
         />
       </div>
       <div className="bottom-controls">
