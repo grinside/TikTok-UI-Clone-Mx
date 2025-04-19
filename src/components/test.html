@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Story Maxit + Pub Revive</title>
+
+  <link href="https://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/videojs-vast-vpaid@1.2.2/bin/videojs.vast.vpaid.min.css" rel="stylesheet" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .video-js {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+
+  <video id="story-player" class="video-js vjs-default-skin" controls preload="auto" playsinline webkit-playsinline></video>
+
+  <!-- ✅ Vidéo.js v6 (stable pour vast-vpaid 1.2.2) -->
+  <script src="https://vjs.zencdn.net/6.6.3/video.js"></script>
+
+  <!-- ✅ Contrib Ads -->
+  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.6.5/dist/videojs-contrib-ads.min.js"></script>
+
+  <!-- ✅ VAST/VPAID stable -->
+  <script src="https://cdn.jsdelivr.net/npm/videojs-vast-vpaid@1.2.2/bin/videojs.vast.vpaid.min.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var player = videojs('story-player', {
+        autoplay: true,
+        muted: true,
+        controls: true
+      });
+
+      player.ready(function () {
+        console.log("✅ Player prêt. Init VAST…");
+
+        player.vastClient({
+          adTagUrl: "https://ad.maxit.live/www/delivery/fc.php?script=apVideo:vast2&zoneid=4",
+          playAdAlways: true,
+          verbosity: 4,
+          adCancelTimeout: 5000,
+          adsEnabled: true
+        });
+
+        player.src({
+          src: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+          type: "application/x-mpegURL"
+        });
+
+        player.play();
+      });
+    });
+  </script>
+
+</body>
+</html>
