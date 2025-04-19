@@ -27,7 +27,7 @@ const VideoCard = (props) => {
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
-          console.warn('Autoplay bloqué, en attente d’une interaction :', error);
+          console.warn('Autoplay  bloqué, en attente d’une interaction :', error);
         });
       }
     }
