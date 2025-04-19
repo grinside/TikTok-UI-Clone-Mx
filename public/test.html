@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maxit Story avec Pub IMA</title>
+  <title>Maxit avec pub IMA (fixé)</title>
 
   <!-- Video.js -->
-  <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+  <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
+  <!-- IMA CSS -->
   <link href="https://cdn.jsdelivr.net/npm/videojs-ima@1.10.1/dist/videojs.ima.css" rel="stylesheet" />
 
   <style>
@@ -14,14 +15,13 @@
       margin: 0;
       padding: 0;
       background: #000;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
     }
 
     .video-js {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
@@ -29,9 +29,13 @@
 
   <video id="story-player" class="video-js vjs-default-skin" controls preload="auto" playsinline webkit-playsinline></video>
 
-  <!-- Scripts -->
+  <!-- Scripts nécessaires -->
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+  <!-- 🔥 AJOUT OBLIGATOIRE -->
+  <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.6.5/dist/videojs-contrib-ads.min.js"></script>
+  <!-- SDK Google IMA -->
   <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+  <!-- Plugin IMA -->
   <script src="https://cdn.jsdelivr.net/npm/videojs-ima@1.10.1/dist/videojs.ima.min.js"></script>
 
   <script>
@@ -45,21 +49,19 @@
       player.ready(function () {
         console.log("✅ Player prêt, configuration IMA…");
 
+        // ✅ Config IMA
         player.ima({
-          adTagUrl: 'https://ad.maxit.live/www/delivery/fc.php?script=apVideo:vast2&zoneid=4', // ✅ Ton VAST Maxit ici
+          adTagUrl: 'https://ad.maxit.live/www/delivery/fc.php?script=apVideo:vast2&zoneid=4',
           debug: true
         });
 
-        // Important : appeler init du conteneur pub
         player.ima.initializeAdDisplayContainer();
 
-        // Charger la vidéo principale HLS
         player.src({
           src: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
           type: 'application/x-mpegURL'
         });
 
-        // Démarre la pub dès que prêt
         player.ima.requestAds();
         player.play();
       });
