@@ -1,9 +1,13 @@
 .video {
+  display: flex;
+  justify-content: center;  /* centre horizontalement */
+  align-items: center;      /* centre verticalement */
+  width: 100vw;
+  height: 100vh;
   position: relative;
-  width: 100%;
-  height: auto;
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
   scroll-snap-align: start;
+  background-color: black;  /* pour éviter le blanc autour */
 }
 
 .video::before {
@@ -23,7 +27,7 @@
 .aspect-4-3 {
   position: relative;
   width: 100%;
-  max-width: 640px; /* optionnel : limite la largeur max si tu veux */
+  max-width: 640px;        /* optionnel : largeur max */
   aspect-ratio: 4 / 3;
   background-color: black;
   overflow: hidden;
