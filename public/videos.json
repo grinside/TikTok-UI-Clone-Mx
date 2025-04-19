@@ -1,0 +1,24 @@
+[
+  {
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "profilePic": "https://p16-sign-useast2a.tiktokcdn.com/...jpeg",
+    "username": "csjackie",
+    "description": "Lol nvm #compsci",
+    "song": "Original sound - Famed Flames",
+    "likes": 430,
+    "comments": 13,
+    "saves": 23,
+    "shares": 1
+  },
+  {
+    "url": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    "profilePic": "https://p16-sign-va.tiktokcdn.com/...jpeg",
+    "username": "dailydotdev",
+    "description": "Every developer brain",
+    "song": "sound - J Rob",
+    "likes": 13400,
+    "comments": 3121,
+    "saves": 254,
+    "shares": 420
+  }
+]
