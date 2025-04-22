@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maxit avec pub IMA (fixé)</title>
+  <title>Maxit Story Mobile + Pub IMA</title>
 
-  <!-- Video.js -->
+  <!-- Video.js & IMA styles -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
-  <!-- IMA CSS -->
   <link href="https://cdn.jsdelivr.net/npm/videojs-ima@1.10.1/dist/videojs.ima.css" rel="stylesheet" />
 
   <style>
@@ -17,54 +16,118 @@
       background: #000;
       width: 100vw;
       height: 100vh;
+      overflow: hidden;
     }
 
     .video-js {
       width: 100%;
       height: 100%;
     }
+
+    #overlay-start {
+      position: absolute;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #skip-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      padding: 10px 16px;
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <video id="story-player" class="video-js vjs-default-skin" controls preload="auto" playsinline webkit-playsinline></video>
+  <!-- Overlay pour forcer l’interaction (autoplay mobile oblige) -->
+  <div id="overlay-start">Appuyez pour lancer la vidéo</div>
+  <button id="skip-btn">Passer la pub</button>
 
-  <!-- Scripts nécessaires -->
+  <video id="story-player" class="video-js vjs-default-skin" controls muted playsinline webkit-playsinline preload="auto"></video>
+
+  <!-- Scripts -->
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
-  <!-- 🔥 AJOUT OBLIGATOIRE -->
   <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-ads@6.6.5/dist/videojs-contrib-ads.min.js"></script>
-  <!-- SDK Google IMA -->
   <script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
-  <!-- Plugin IMA -->
   <script src="https://cdn.jsdelivr.net/npm/videojs-ima@1.10.1/dist/videojs.ima.min.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const player = videojs('story-player', {
-        autoplay: true,
-        muted: true,
-        controls: true
-      });
+    const player = videojs('story-player', {
+      autoplay: false,
+      muted: true,
+      controls: true
+    });
 
-      player.ready(function () {
-        console.log("✅ Player prêt, configuration IMA…");
+    const overlay = document.getElementById('overlay-start');
+    const skipBtn = document.getElementById('skip-btn');
 
-        // ✅ Config IMA
-        player.ima({
-          adTagUrl: 'https://ad.maxit.live/www/delivery/fc.php?script=apVideo:vast2&zoneid=4',
-          debug: true
-        });
+    let adsInitialized = false;
+    let skipTimer;
 
+    // Config pub IMA
+    player.ima({
+      adTagUrl: 'https://ad.maxit.live/www/delivery/fc.php?script=apVideo:vast2&zoneid=4',
+      debug: true
+    });
+
+    // Interaction utilisateur obligatoire sur mobile
+    overlay.addEventListener('click', () => {
+      overlay.style.display = 'none';
+
+      if (!adsInitialized) {
         player.ima.initializeAdDisplayContainer();
+        adsInitialized = true;
+      }
 
-        player.src({
-          src: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-          type: 'application/x-mpegURL'
-        });
+      player.ima.requestAds();
 
-        player.ima.requestAds();
-        player.play();
+      player.src({
+        src: 'https://dchiplr12yf4h.cloudfront.net/mobibase/ortm-1/index.m3u8', // remplace par ta vidéo
+        type: 'application/x-mpegURL'
       });
+
+      player.play();
+    });
+
+    // Affiche le bouton "Passer la pub" après 5s
+    player.on('ads-ad-started', () => {
+      skipTimer = setTimeout(() => {
+        skipBtn.style.display = 'block';
+      }, 5000);
+    });
+
+    // Nettoie quand la pub se termine
+    const stopAd = () => {
+      skipBtn.style.display = 'none';
+      clearTimeout(skipTimer);
+    };
+
+    player.on('ads-ad-ended', stopAd);
+    player.on('ads-ad-skipped', stopAd);
+
+    // Bouton skip
+    skipBtn.addEventListener('click', () => {
+      player.ima.skipLinearAd();
+      stopAd();
     });
   </script>
 
