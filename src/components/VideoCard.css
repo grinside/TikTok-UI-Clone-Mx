@@ -1,49 +1,28 @@
 .video {
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  justify-content: center;     /* 🔥 centre verticalement */
-  align-items: stretch;        /* garde la vidéo à 100% largeur */
+  align-items: center;
+  justify-content: center;
   scroll-snap-align: start;
   background-color: black;
 }
 
-.video::before {
-  content: '';
-  display: block;
-  box-shadow: 0 -33px 48px rgba(0, 0, 0, 0.5) inset;
-  width: 100%;
-  pointer-events: none;
-  z-index: 99;
-  height: 100%;
-  top: 0;
-  left: 0;
-  position: absolute;
-  background: transparent;
-}
-
-.aspect-4-3 {
-  position: relative;
-  width: 100%;
-  max-width: 640px;        /* optionnel : largeur max */
-  aspect-ratio: 4 / 3;
-  background-color: black;
-  overflow: hidden;
-}
-
 .player {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* ou contain si tu préfères tout voir */
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover; /* ou contain selon ton style */
 }
 
 .bottom-controls {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
   display: flex;
-  align-items: flex-end;
-  height: 100%;
+  justify-content: space-between;
+  padding: 1rem;
+  box-sizing: border-box;
+  color: white;
 }

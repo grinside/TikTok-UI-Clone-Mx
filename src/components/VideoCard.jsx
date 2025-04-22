@@ -27,6 +27,7 @@ const VideoCard = ({
       const hls = new Hls();
       hls.loadSource(url);
       hls.attachMedia(video);
+
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (autoplay) {
           video.play().catch((err) =>
@@ -59,20 +60,19 @@ const VideoCard = ({
 
   return (
     <div className="video">
-      <div className="aspect-4-3">
-        <video
-          className="player"
-          onClick={onVideoPress}
-          ref={(ref) => {
-            videoRef.current = ref;
-            if (setVideoRef) setVideoRef(ref);
-          }}
-          loop
-          muted
-          playsInline
-          controls={true}
-        />
-      </div>
+      <video
+        className="player"
+        onClick={onVideoPress}
+        ref={(ref) => {
+          videoRef.current = ref;
+          if (setVideoRef) setVideoRef(ref);
+        }}
+        loop
+        muted={autoplay}
+        playsInline
+        controls
+        autoPlay={autoplay}
+      />
       <div className="bottom-controls">
         <div className="footer-left">
           <FooterLeft username={username} description={description} song={song} />
