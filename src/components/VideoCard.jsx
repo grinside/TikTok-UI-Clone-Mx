@@ -1,19 +1,17 @@
 import React, { useRef, useEffect } from 'react';
 import Hls from 'hls.js';
-import FooterLeft from './FooterLeft';
-import FooterRight from './FooterRight';
 import './VideoCard.css';
 
 const VideoCard = ({
   url,
+  profilePic,
   username,
   description,
   song,
   likes,
-  shares,
   comments,
   saves,
-  profilePic,
+  shares,
   setVideoRef,
   autoplay
 }) => {
@@ -30,57 +28,40 @@ const VideoCard = ({
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         if (autoplay) {
-          video.play().catch((err) =>
-            console.warn('Autoplay bloqué, en attente d’interaction :', err)
-          );
+          video.play().catch(err => console.warn('Autoplay bloqué :', err));
         }
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url;
       video.addEventListener('loadedmetadata', () => {
         if (autoplay) {
-          video.play().catch((err) =>
-            console.warn('Autoplay bloqué (Apple) :', err)
-          );
+          video.play().catch(err => console.warn('Autoplay bloqué Apple :', err));
         }
       });
-    } else {
-      console.error('HLS non supporté sur ce navigateur.');
     }
   }, [url, autoplay]);
 
-  const onVideoPress = () => {
+  const handleClick = () => {
     const video = videoRef.current;
-    if (video.paused) {
-      video.play().catch((err) => console.warn('Erreur play() :', err));
-    } else {
-      video.pause();
-    }
+    if (video.paused) video.play();
+    else video.pause();
   };
 
   return (
     <div className="video">
       <video
         className="player"
-        onClick={onVideoPress}
         ref={(ref) => {
           videoRef.current = ref;
           if (setVideoRef) setVideoRef(ref);
         }}
-        loop
+        onClick={handleClick}
         muted={autoplay}
         playsInline
+        loop
         controls
         autoPlay={autoplay}
       />
-      <div className="bottom-controls">
-        <div className="footer-left">
-          <FooterLeft username={username} description={description} song={song} />
-        </div>
-        <div className="footer-right">
-          <FooterRight likes={likes} shares={shares} comments={comments} saves={saves} profilePic={profilePic} />
-        </div>
-      </div>
     </div>
   );
 };
