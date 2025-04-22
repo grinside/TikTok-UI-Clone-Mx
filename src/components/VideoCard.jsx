@@ -21,23 +21,32 @@ const VideoCard = ({
     const video = videoRef.current;
     if (!video) return;
 
+    const tryAutoplay = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => console.log('Autoplay OK'))
+          .catch(err => console.warn('Autoplay bloqué :', err));
+      }
+    };
+
     if (Hls.isSupported() && url.endsWith('.m3u8')) {
       const hls = new Hls();
       hls.loadSource(url);
       hls.attachMedia(video);
-
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        if (autoplay) {
-          video.play().catch(err => console.warn('Autoplay bloqué :', err));
-        }
+        if (autoplay) tryAutoplay();
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url;
       video.addEventListener('loadedmetadata', () => {
-        if (autoplay) {
-          video.play().catch(err => console.warn('Autoplay bloqué Apple :', err));
-        }
+        if (autoplay) tryAutoplay();
       });
+    } else {
+      video.src = url;
+      video.oncanplay = () => {
+        if (autoplay) tryAutoplay();
+      };
     }
   }, [url, autoplay]);
 
@@ -56,11 +65,11 @@ const VideoCard = ({
           if (setVideoRef) setVideoRef(ref);
         }}
         onClick={handleClick}
-        muted={autoplay}
+        muted
         playsInline
         loop
+        autoPlay
         controls
-        autoPlay={autoplay}
       />
     </div>
   );
