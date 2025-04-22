@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maxit Story Mobile + Pub IMA</title>
+  <title>Maxit Video Mobile + Pub IMA</title>
 
   <!-- Video.js & IMA styles -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.min.css" rel="stylesheet" />
@@ -47,10 +47,10 @@
       right: 20px;
       z-index: 9999;
       padding: 10px 16px;
-      background-color: rgba(0,0,0,0.7);
+      background-color: rgba(0,0,0,0.8);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 16px;
       display: none;
     }
@@ -58,7 +58,7 @@
 </head>
 <body>
 
-  <!-- Overlay pour forcer l’interaction (autoplay mobile oblige) -->
+  <!-- Overlay de lancement -->
   <div id="overlay-start">Appuyez pour lancer la vidéo</div>
   <button id="skip-btn">Passer la pub</button>
 
@@ -81,15 +81,14 @@
     const skipBtn = document.getElementById('skip-btn');
 
     let adsInitialized = false;
-    let skipTimer;
+    let skipTimer = null;
 
-    // Config pub IMA
+    // Initialisation du plugin IMA
     player.ima({
       adTagUrl: 'https://ad.maxit.live/www/delivery/fc.php?script=apVideo:vast2&zoneid=4',
       debug: true
     });
 
-    // Interaction utilisateur obligatoire sur mobile
     overlay.addEventListener('click', () => {
       overlay.style.display = 'none';
 
@@ -101,21 +100,27 @@
       player.ima.requestAds();
 
       player.src({
-        src: 'https://dchiplr12yf4h.cloudfront.net/mobibase/ortm-1/index.m3u8', // remplace par ta vidéo
+        src: 'https://dchiplr12yf4h.cloudfront.net/33diffmedia/bblack-africa/index.m3u8', // remplace par ta vraie vidéo
         type: 'application/x-mpegURL'
       });
 
       player.play();
     });
 
-    // Affiche le bouton "Passer la pub" après 5s
+    // Affiche le bouton "Skip pub" si la pub est skippable
     player.on('ads-ad-started', () => {
+      const adsManager = player.ima.getAdsManager();
+      if (!adsManager) return;
+
       skipTimer = setTimeout(() => {
-        skipBtn.style.display = 'block';
-      }, 5000);
+        const ad = adsManager.getCurrentAd();
+        if (ad && ad.isSkippable()) {
+          skipBtn.style.display = 'block';
+        }
+      }, 5000); // apparait au bout de 5s
     });
 
-    // Nettoie quand la pub se termine
+    // Cache le bouton à la fin de la pub
     const stopAd = () => {
       skipBtn.style.display = 'none';
       clearTimeout(skipTimer);
@@ -123,11 +128,17 @@
 
     player.on('ads-ad-ended', stopAd);
     player.on('ads-ad-skipped', stopAd);
+    player.on('adserror', stopAd);
 
-    // Bouton skip
+    // Fonction du bouton Skip
     skipBtn.addEventListener('click', () => {
-      player.ima.skipLinearAd();
-      stopAd();
+      const adsManager = player.ima.getAdsManager();
+      if (adsManager && adsManager.getCurrentAd() && adsManager.getCurrentAd().isSkippable()) {
+        adsManager.skip();
+        stopAd();
+      } else {
+        console.warn("⛔ Pub non skippable");
+      }
     });
   </script>
 
